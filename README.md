@@ -12,11 +12,11 @@ Put dc_create.sh somewhere on your computer.
 * Change to that directory in terminal.
 * Export the database from the live site you are copying and note its location.
 * You will need:
-** the name of the live domain (i.e., example.com)
-** the link to the repository
-** the name of the database 
-** a saved export of the database
-** a plugins directory saved locally that has at least ACF in it 
+  - the name of the live domain (i.e., example.com)
+  - the link to the repository
+  - the name of the database 
+  - a saved export of the database
+  - a plugins directory saved locally that has at least ACF in it 
 
 * You will be prompted to enter the repository. It will be installed where you are. The script will initialize the repository locally.
 * You will be asked to enter the database name (as in examplecom)
