@@ -223,6 +223,12 @@ volumes:
 EOL
 
 echo "docker-compose.yml created."
-echo "run docker-compose up -d"
+echo "running docker-compose up -d"
 
-echo "open site at http://localhost:$wordpress_port"
+docker-compose up -d
+
+url=http://localhost:$wordpress_port
+
+echo "opening site at $url"
+
+open "$url"
