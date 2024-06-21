@@ -25,9 +25,11 @@ is_port_in_use() {
 
 echo "Enter repository"
 read repository
+echo
 
 echo "Enter database name:"
 read database_name
+echo
 
 echo "Ports in use: ${ports_in_use[@]}"
 
@@ -64,17 +66,20 @@ while true; do
 	fi
 done
 
+echo
 echo "Enter your wordpress database table prefix (i.e. wp_)"
 read table_prefix
-
+echo
 echo "Enter the live domain URL without https:// (e.g. example.com)"
 read live_domain
 
+echo
 echo "repository: $repository"
 echo "database name: $database_name"
 echo "ports: $wordpress_port, $phpmyadmin_port, $database_port"
 echo "table prefix: $table_prefix"
 echo "live domain: $live_domain"
+echo
 
 git clone $repository .
 
@@ -101,6 +106,7 @@ while true; do
 		cp -r "$plugins_path" "./wp-content/$dir_name"
 
 		echo "Plugins directory has been copied to ./wp-content"
+		echo
 		break
 	else
 		echo "The specified path does not exist or is not a directory. Please check the path and try again."
@@ -112,6 +118,7 @@ while true; do
 	#prompt for schema dir path
 	echo "Please enter the path to the SQL file"
 	read file_path
+	echo
 
 	# expand the ~ char to the home directory
 	expanded_file_path=$(eval echo "$file_path")
@@ -128,12 +135,14 @@ while true; do
 
 		sql_file="./schema/$(basename "$expanded_file_path")"
 		local_site_url="http://localhost:$wordpress_port"
+		echo "Local site url: $local_site_url"
 
 		# Replace live domain with local site url
 		sed -i.bak "s|https://www.$live_domain|$local_site_url|g" "$sql_file"
-		sed -i.bak "s|https://$lisve_domain|$local_site_url|g" "$sql_file"
+		sed -i.bak "s|https://$live_domain|$local_site_url|g" "$sql_file"
 
 		echo "URLs have been updated in the SQL file and the file has been copied to ./schema/"
+		echo
 		break
 	else
 		echo "The specified path does not exist or is not a .sql file. Please check the path and try again."
@@ -141,32 +150,21 @@ while true; do
 
 done
 
-while true; do
-	# Prompt for live domain name
-	echo "Please enter the live domain name (e.g., example.com):"
-	read live_domain
+echo "Creating .htaccess file in wp-content/uploads..."
 
-	# Validate the domain name format (simple regex check)
-	if [[ "$live_domain" =~ ^[a-zA-Z0-9.-]+$ ]]; then
-		echo "Creating .htaccess file in wp-content/uploads..."
+# Ensure wp-content/uploads directory exists
+mkdir -p wp-content/uploads
 
-		# Ensure wp-content/uploads directory exists
-		mkdir -p wp-content/uploads
-
-		# Create .htaccess file with the specified content
-		cat <<EOL >wp-content/uploads/.htaccess
+# Create .htaccess file with the specified content
+cat <<EOL >wp-content/uploads/.htaccess
 RewriteEngine on
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule (.*) https://$live_domain/wp-content/uploads/\$1 [L]
 EOL
 
-		echo ".htaccess file has been created in wp-content/uploads."
-		break
-	else
-		echo "Invalid domain name. Please enter a valid domain name."
-	fi
-done
+echo ".htaccess file has been created in wp-content/uploads."
+echo
 
 # Create docker-compose file
 cat <<EOL >docker-compose.yml
@@ -224,10 +222,25 @@ EOL
 
 echo "docker-compose.yml created."
 echo "running docker-compose up -d"
+echo
 
 docker-compose up -d
 
 url=http://localhost:$wordpress_port
+
+# Wait until the WordPress site is up
+# Function to check if the WordPress site is up
+check_site() {
+	curl --output /dev/null --silent --head --fail "$url"
+}
+echo "Waiting for WordPress to be available at $url..."
+while ! check_site; do
+	echo -n "."
+	sleep 1
+done
+
+echo
+echo "WordPress is up and running at $url"
 
 echo "opening site at $url"
 
