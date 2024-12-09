@@ -1,6 +1,4 @@
 #!/bin/bash
-# todo: sed in database for live domain with localhost
-# todo: document and repo
 # Create a docker-compose file to create a site from a repo
 # Run this script from inside repo. It will create a docker-compose file from information it gathers.
 
@@ -86,11 +84,12 @@ git clone $repository .
 # Check for valid directory
 while true; do
 	#prompt for plugins dir path
-	echo "Please enter the path to the plugins directory"
-	read dir_path
+	# echo "Please enter the path to the plugins directory"
+	# read dir_path
 
 	# expand the ~ char to the home directory
-	plugins_path=$(eval echo "$dir_path")
+	# plugins_path=$(eval echo "$dir_path")
+	plugins_path=$(eval echo "~/dev/plugins")
 
 	# check if the entered path is valid
 	if [ -d "$plugins_path" ]; then
@@ -116,12 +115,13 @@ done
 # Check for valid schema directory
 while true; do
 	#prompt for schema dir path
-	echo "Please enter the path to the SQL file"
-	read file_path
-	echo
+	# echo "Please enter the path to the SQL file"
+	# read file_path
+	# echo
 
 	# expand the ~ char to the home directory
-	expanded_file_path=$(eval echo "$file_path")
+	# expanded_file_path=$(eval echo "$file_path")
+	expanded_file_path=$(eval echo "~/Downloads/$database_name.sql")
 
 	# check if the entered path is valid
 	if [ -f "$expanded_file_path" ] && [[ "$expanded_file_path" == *.sql ]]; then
@@ -131,7 +131,7 @@ while true; do
 		mkdir -p schema
 
 		# Copy sql file to schema
-		cp "$expanded_file_path" ./schema/
+		mv "$expanded_file_path" ./schema/
 
 		sql_file="./schema/$(basename "$expanded_file_path")"
 		local_site_url="http://localhost:$wordpress_port"
